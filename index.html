@@ -1,32 +1,70 @@
 <html>
 <body>
-<h1><span id="myname"></span></h1>
+<h1>我叫<span id="myname"></span></h1>
 
-<a id="btn" href="login.html">登陆</a>
-     <p>我的学号是<span id="mynumber"></span>
-    </p> 
-    <img src="matrix.png">
-    <img src="timg.jpg" id="logo" style="border-radius: 10px 20px 40px 80px" > 
+    <p>我的学号是<span id="mynumber"></span>
+    </p>
+    <a id="alogin" href="login.html">去登录</a>
+    <a id="alogout" href="#">去注销</a>
+
+    <input id="content" type="text">
+    <button id="btnAdd">添加</button>
+<ul id="ul">
+
+</ul>
     <script src="jquery-3.4.1.js"></script>
     <script>
         $(function(){
-          var callback=function(result){
-              $("#myname").text(result.myname);
-              $("#mynumber").text(result.mynumber);
-          }
-          $.ajax({
-              type:"POST",
-              xhrFields:{
-                  withCredentials:true
-              },
-              url:"http://10.30.201.71:8585/data.json",
-              contentType:"application/json",
-              data:JSON.stringify({"stunumber":"18002090105"}),
-              success:callback,
-          });
+
+            var callback=function (result){
+                if(!result || !result.myname){
+                    $("#alogout").hide();
+                    $("#content").hide();
+                    $("#btnAdd").hide();
+                }else{
+                    $("#myname").text(result.myname);
+                    $("#mynumber").text(result.mynumber);
+                    $("#alogin").hide();
+                }
+             }
+             $.ajax({
+                type:"POST",
+                xhrFields: {
+                        withCredentials: true
+                },
+                url:"http://127.0.0.1:8585/userinfo",
+                contentType:"application/json",
+                success:callback
+             });
+            $.get("http://127.0.0.1:8585/lvlilist",
+            function(result){
+                for(var i=0;i<result.length;i++){
+                    $("#ul").append("<li>"+result[i]+"</li>")
+                }
+            })
+            $("#alogout").click(function(){
+                $.ajax({
+                type:"POST",
+                xhrFields: {
+                        withCredentials: true
+                },
+                url:"http://127.0.0.1:8585/logout",
+                success:function(){
+                    location.href="index.html";
+                }
+             });
+            });
+        $("#btnAdd").click(function(){
+            $.post("http://127.0.0.1:8585/addlvli",
+            {livi:$("#content").val()},
+            function(){
+                location.href="index.html";
+            })
         })
-       
-        
+   
+        })
+
+
     </script>
 </body>
 </html>
